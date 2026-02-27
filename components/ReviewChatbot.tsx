@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Loader2, Sparkles } from "lucide-react";
+import api from "@/lib/axios";
+import { API_PATHS } from "@/lib/apiPaths";
 
 interface Message {
     role: "user" | "model";
@@ -25,9 +27,9 @@ export default function ReviewChatbot({ questionId, questionText, headless = fal
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const res = await fetch(`/api/chat?questionId=\${questionId}`);
-                if (res.ok) {
-                    const data = await res.json();
+                const res = await api.get(API_PATHS.getChatByQuestionId(questionId));
+                if (res.status === 200) {
+                    const data = res.data;
                     if (data.messages && data.messages.length > 0) {
                         setMessages(data.messages);
                     }
@@ -60,13 +62,9 @@ export default function ReviewChatbot({ questionId, questionText, headless = fal
         setIsLoading(true);
 
         try {
-            const res = await fetch("/api/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ questionId, message: userMsg }),
-            });
+            const res = await api.post(API_PATHS.CHAT, { questionId, message: userMsg });
 
-            const data = await res.json();
+            const data = res.data;
 
             if (data.messages) {
                 // Keep the server truth

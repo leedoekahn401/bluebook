@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import logo from "@/assets/sat-png-4.png";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { LogOut, Settings, BarChart2 } from "lucide-react";
@@ -25,11 +27,11 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                            <span className="text-white font-bold text-lg leading-none">B</span>
-                        </div>
-                        <Link href="/" className="font-bold text-xl text-slate-900 hover:text-blue-600">
-                            Practice Dashboard
+                        <Link href="/" className="flex items-center gap-2">
+                            <Image src={logo} alt="SATTOT Logo" width={32} height={32} className="rounded object-contain" />
+                            <span className="font-bold text-xl text-slate-900 hover:text-blue-600">
+                                SATTOT
+                            </span>
                         </Link>
                     </div>
 

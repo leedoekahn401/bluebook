@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import logo from "@/assets/sat-png-4.png";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -7,6 +9,8 @@ import TestCard from "@/components/TestCard";
 import Loading from "@/components/Loading";
 import ActivityHeatmap from "@/components/ActivityHeatmap";
 import { Trophy, Flame, Target, BookOpen } from "lucide-react";
+import api from "@/lib/axios";
+import { API_PATHS } from "@/lib/apiPaths";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -21,18 +25,17 @@ export default function Dashboard() {
   const [sortOption, setSortOption] = useState("newest");
 
   useEffect(() => {
-    // Fetch user stats when session exists
     const loadData = async () => {
       setLoading(true);
       try {
-        const testsRes = await fetch("/api/tests");
-        const testsData = await testsRes.json();
+        const testsRes = await api.get(API_PATHS.TESTS);
+        const testsData = testsRes.data;
         setTests(testsData.tests || []);
 
         if (session) {
           // Fetch user specific stats
-          const statsRes = await fetch("/api/results");
-          const statsData = await statsRes.json();
+          const statsRes = await api.get(API_PATHS.RESULTS);
+          const statsData = statsRes.data;
           // Simplified stat calc from results
           if (statsData.results) {
             setUserResults(statsData.results);
@@ -56,17 +59,13 @@ export default function Dashboard() {
   if (status === "loading") {
     return <Loading />;
   }
-
-  // If not logged in, show marketing CTA
   if (status === "unauthenticated" || !session) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col">
         <header className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Bluebook Clone</h1>
+            <Image src={logo} alt="SATTOT Logo" width={32} height={32} className="rounded object-contain" />
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">SATTOT</h1>
           </div>
           <div className="space-x-4">
             <Link href="/auth" className="text-slate-600 hover:text-slate-900 font-medium">

@@ -26,10 +26,8 @@ export async function POST(req: Request) {
 
         await dbConnect();
 
-        // Find or create chat session
         let chat = await Chat.findOne({ userId: session.user.id, questionId });
 
-        // Fetch context (the specific question they are asking about)
         const question = await Question.findById(questionId);
 
         if (!chat) {

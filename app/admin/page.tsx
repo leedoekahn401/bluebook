@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Plus, Save, FileText, CheckCircle, ListPlus, Trash2 } from "lucide-react";
 import Loading from "@/components/Loading";
+import api from "@/lib/axios";
+import { API_PATHS } from "@/lib/apiPaths";
 
 export default function AdminDashboard() {
     const { data: session, status } = useSession();
@@ -39,8 +41,8 @@ export default function AdminDashboard() {
 
     const fetchTests = async () => {
         try {
-            const res = await fetch("/api/tests");
-            const data = await res.json();
+            const res = await api.get(API_PATHS.TESTS);
+            const data = res.data;
             setTests(data.tests || []);
             if (data.tests?.length > 0 && !selectedTestId) {
                 setSelectedTestId(data.tests[0]._id);
@@ -63,26 +65,22 @@ export default function AdminDashboard() {
         setTestMessage("");
 
         try {
-            const res = await fetch("/api/tests", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...testForm,
-                    sections: [
-                        { name: "Reading and Writing", questionsCount: 27, timeLimit: 32 },
-                        { name: "Math", questionsCount: 22, timeLimit: 35 }
-                    ]
-                })
+            const res = await api.post(API_PATHS.TESTS, {
+                ...testForm,
+                sections: [
+                    { name: "Reading and Writing", questionsCount: 27, timeLimit: 32 },
+                    { name: "Math", questionsCount: 22, timeLimit: 35 }
+                ]
             });
 
-            if (res.ok) {
+            if (res.status === 200 || res.status === 201) {
                 setTestMessage("Test created successfully!");
                 setTestForm({ title: "", timeLimit: 120, difficulty: "medium" });
                 fetchTests(); // Refresh test list
             } else {
-                setTestMessage("Error creating test.");
+                setTestMessage(`Error: ${res.data.error || "Error creating test."}`);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
             setTestMessage("Network error");
         }
@@ -110,16 +108,12 @@ export default function AdminDashboard() {
         }
 
         try {
-            const res = await fetch("/api/questions", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...questionForm,
-                    testId: selectedTestId
-                })
+            const res = await api.post(API_PATHS.QUESTIONS, {
+                ...questionForm,
+                testId: selectedTestId
             });
 
-            if (res.ok) {
+            if (res.status === 200 || res.status === 201) {
                 setQuestionMessage("Question added successfully!");
                 // Reset form but keep section and test selection
                 setQuestionForm({
@@ -131,11 +125,10 @@ export default function AdminDashboard() {
                     explanation: "",
                 });
             } else {
-                const data = await res.json();
-                console.error("Failed to add question:", data);
-                setQuestionMessage(`Error: ${data.error || "Unknown database error"}`);
+                console.error("Failed to add question:", res.data);
+                setQuestionMessage(`Error: ${res.data.error || "Unknown database error"}`);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
             setQuestionMessage("Network error");
         }

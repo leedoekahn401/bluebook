@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import api from "@/lib/axios";
+import { API_PATHS } from "@/lib/apiPaths";
 
 export default function AuthPage() {
     const router = useRouter();
@@ -33,24 +35,19 @@ export default function AuthPage() {
                     router.refresh();
                 }
             } else {
-                const res = await fetch("/api/auth/register", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password, name }),
-                });
+                const res = await api.post(API_PATHS.AUTH_REGISTER, { email, password, name });
 
-                if (res.ok) {
+                if (res.status === 200 || res.status === 201) {
                     // Auto login after register
                     await signIn("credentials", { email, password, redirect: false });
                     router.push("/");
                     router.refresh();
                 } else {
-                    const data = await res.json();
-                    setError(data.message || "Registration failed");
+                    setError(res.data.message || "Registration failed");
                 }
             }
         } catch (err: any) {
-            setError("An unexpected error occurred");
+            setError(err.response?.data?.message || err.response?.data?.error || "An unexpected error occurred");
         } finally {
             setLoading(false);
         }

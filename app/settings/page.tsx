@@ -4,6 +4,8 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { User, Save, CheckCircle, Lock } from "lucide-react";
 import Loading from "@/components/Loading";
+import api from "@/lib/axios";
+import { API_PATHS } from "@/lib/apiPaths";
 
 export default function SettingsPage() {
     const { data: session, status, update } = useSession();
@@ -49,23 +51,18 @@ export default function SettingsPage() {
         setMessage("");
 
         try {
-            const res = await fetch("/api/user/settings", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name }),
-            });
+            const res = await api.put(API_PATHS.USER_SETTINGS, { name });
 
-            if (res.ok) {
+            if (res.status === 200) {
                 setMessage("Profile updated successfully!");
                 // Update NextAuth session to reflect the new name in Navbar
                 await update({ name });
             } else {
-                const data = await res.json();
-                setMessage(`Error: ${data.error || "Failed to update profile"}`);
+                setMessage(`Error: ${res.data.error || "Failed to update profile"}`);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            setMessage("Network error. Could not update profile.");
+            setMessage(`Error: ${err.response?.data?.error || "Network error. Could not update profile."}`);
         } finally {
             setIsSaving(false);
         }
@@ -88,25 +85,19 @@ export default function SettingsPage() {
         setPasswordMessage("");
 
         try {
-            const res = await fetch("/api/user/password", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
-            });
+            const res = await api.put(API_PATHS.USER_PASSWORD, { currentPassword, newPassword, confirmPassword });
 
-            const data = await res.json();
-
-            if (res.ok) {
+            if (res.status === 200) {
                 setPasswordMessage("Password updated successfully!");
                 setCurrentPassword("");
                 setNewPassword("");
                 setConfirmPassword("");
             } else {
-                setPasswordMessage(`Error: ${data.error || "Failed to update password"}`);
+                setPasswordMessage(`Error: ${res.data.error || "Failed to update password"}`);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            setPasswordMessage("Network error. Could not update password.");
+            setPasswordMessage(`Error: ${err.response?.data?.error || "Network error. Could not update password."}`);
         } finally {
             setIsPasswordSaving(false);
         }

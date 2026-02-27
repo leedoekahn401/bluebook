@@ -6,6 +6,8 @@ import { TestHeader, TestFooter } from "@/components/TestLayout";
 import QuestionViewer from "@/components/QuestionViewer";
 import Loading from "@/components/Loading";
 import DesmosCalculator from "@/components/DesmosCalculator";
+import api from "@/lib/axios";
+import { API_PATHS } from "@/lib/apiPaths";
 
 export default function TestEngine({ testId }: { testId: string }) {
     const router = useRouter();
@@ -31,8 +33,8 @@ export default function TestEngine({ testId }: { testId: string }) {
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
-                const res = await fetch(`/api/questions?testId=${testId}`);
-                const data = await res.json();
+                const res = await api.get(API_PATHS.getQuestionsByTestId(testId));
+                const data = res.data;
 
                 // Let's assume there's an API giving us test info as well, or we pass it
                 // For now, setting mock test info based on length
@@ -107,18 +109,14 @@ export default function TestEngine({ testId }: { testId: string }) {
             // Simple mock scoring logic
             const score = 400 + Math.floor((correctCount / questions.length) * 1200);
 
-            const res = await fetch("/api/results", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    testId,
-                    answers: formattedAnswers,
-                    score,
-                    sectionBreakdown: { readingAndWriting: score / 2, math: score / 2 }
-                })
+            const res = await api.post(API_PATHS.RESULTS, {
+                testId,
+                answers: formattedAnswers,
+                score,
+                sectionBreakdown: { readingAndWriting: score / 2, math: score / 2 }
             });
 
-            if (res.ok) {
+            if (res.status === 200 || res.status === 201) {
                 router.push("/review");
             }
         } catch (err) {
@@ -167,7 +165,7 @@ export default function TestEngine({ testId }: { testId: string }) {
                 />
             </main>
 
-            {/* Adding absolute submit button for demo since Bluebook flow usually has a review screen first */}
+            
             <button
                 onClick={() => {
                     if (confirm("Are you sure you want to end this section and submit your test?")) {

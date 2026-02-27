@@ -4,6 +4,8 @@ import Question from "@/lib/models/Question";
 import Test from "@/lib/models/Test";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import { z } from "zod";
+import { QuestionValidationSchema } from "@/lib/validations/question";
 
 export async function GET(req: Request) {
     try {
@@ -31,24 +33,33 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        await dbConnect();
 
-        // Verify test exists
-        const test = await Test.findById(body.testId);
-        if (!test) {
-            return NextResponse.json({ error: "Test not found" }, { status: 404 });
+        try {
+            const validatedData = QuestionValidationSchema.parse(body);
+            await dbConnect();
+
+            // Verify test exists
+            const test = await Test.findById(validatedData.testId);
+            if (!test) {
+                return NextResponse.json({ error: "Test not found" }, { status: 404 });
+            }
+
+            const newQuestion = await Question.create(validatedData);
+
+            // Add question ref to test
+            if (!test.questions) {
+                test.questions = [];
+            }
+            test.questions.push(newQuestion._id as any);
+            await test.save();
+
+            return NextResponse.json({ question: newQuestion }, { status: 201 });
+        } catch (validationError: any) {
+            if (validationError instanceof z.ZodError) {
+                return NextResponse.json({ error: (validationError as any).errors }, { status: 400 });
+            }
+            throw validationError;
         }
-
-        const newQuestion = await Question.create(body);
-
-        // Add question ref to test
-        if (!test.questions) {
-            test.questions = [];
-        }
-        test.questions.push(newQuestion._id as any);
-        await test.save();
-
-        return NextResponse.json({ question: newQuestion }, { status: 201 });
     } catch (error: any) {
         console.error("POST /api/questions error:", error);
         return NextResponse.json({ error: error.message || "Failed to create question" }, { status: 500 });

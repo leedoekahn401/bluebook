@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ArrowLeft, RefreshCcw, CheckCircle, XCircle, ChevronDown, ChevronUp, Sparkles, X } from "lucide-react";
 import Loading from "@/components/Loading";
 import ReviewChatbot from "@/components/ReviewChatbot";
+import api from "@/lib/axios";
+import { API_PATHS } from "@/lib/apiPaths";
 
 export default function ReviewPage() {
     const { data: session, status } = useSession();
@@ -31,8 +33,8 @@ export default function ReviewPage() {
 
         setLoadingExplanations((prev) => ({ ...prev, [questionId]: true }));
         try {
-            const res = await fetch(`/api/questions/${questionId}/explanation`);
-            const data = await res.json();
+            const res = await api.get(API_PATHS.getQuestionExplanation(questionId));
+            const data = res.data;
             if (data.explanation) {
                 setExpandedExplanations((prev) => ({ ...prev, [questionId]: data.explanation }));
             }
@@ -51,8 +53,8 @@ export default function ReviewPage() {
         if (session) {
             const fetchResults = async () => {
                 try {
-                    const res = await fetch("/api/results");
-                    const data = await res.json();
+                    const res = await api.get(API_PATHS.RESULTS);
+                    const data = res.data;
                     setResults(data.results || []);
                 } catch (e) {
                     console.error(e);
