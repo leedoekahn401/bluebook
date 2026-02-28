@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Button, Popconfirm } from "antd";
 import { TestHeader, TestFooter } from "@/components/TestLayout";
 import QuestionViewer from "@/components/QuestionViewer";
 import Loading from "@/components/Loading";
@@ -165,17 +166,21 @@ export default function TestEngine({ testId }: { testId: string }) {
                 />
             </main>
 
-            
-            <button
-                onClick={() => {
-                    if (confirm("Are you sure you want to end this section and submit your test?")) {
-                        handleSubmit();
-                    }
-                }}
-                className="fixed top-3 right-6 bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded z-[60] text-sm"
-            >
-                Submit Test
-            </button>
+
+            <div className="fixed top-3 right-6 z-[60]">
+                <Popconfirm
+                    title="Submit Test"
+                    description="Are you sure you want to end this section and submit your test?"
+                    onConfirm={handleSubmit}
+                    okText="Yes"
+                    cancelText="No"
+                    placement="bottomRight"
+                >
+                    <Button type="primary" danger>
+                        Submit Test
+                    </Button>
+                </Popconfirm>
+            </div>
 
             <TestFooter
                 currentIndex={currentIndex}

@@ -112,7 +112,7 @@ export default function SettingsPage() {
 
                 {/* Profile Card */}
                 <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                    <div className="p-5 border-b border-slate-200 bg-slate-100 flex items-center gap-2 text-slate-800 font-bold">
+                    <div className="p-5 border-b border-slate-200 bg-white flex items-center gap-2 text-slate-800 font-bold">
                         <User className="w-5 h-5 text-blue-600" />
                         Profile Details
                     </div>
@@ -169,7 +169,7 @@ export default function SettingsPage() {
 
                 {/* Security Card */}
                 <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                    <div className="p-5 border-b border-slate-200 bg-slate-100 flex items-center gap-2 text-slate-800 font-bold">
+                    <div className="p-5 border-b border-slate-200 bg-white flex items-center gap-2 text-slate-800 font-bold">
                         <Lock className="w-5 h-5 text-indigo-600" />
                         Security
                     </div>

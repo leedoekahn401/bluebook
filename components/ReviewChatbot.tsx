@@ -130,7 +130,7 @@ export default function ReviewChatbot({ questionId, questionText, headless = fal
                     <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
                         <Bot className="w-12 h-12 text-indigo-200 mb-3" />
                         <p className="text-sm">I'm here to help you understand this question!</p>
-                        <p className="text-xs mt-2 text-slate-400">Ask me anything about the concepts or for Khan Academy resources.</p>
+                        <p className="text-xs mt-2 text-slate-400">Ask me anything about the concepts</p>
                     </div>
                 ) : (
                     messages.map((msg, idx) => (

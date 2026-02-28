@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Clock, EyeOff, Eye, ChevronLeft, ChevronRight, Calculator, Check, Settings, Flag } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "antd";
 
 // Define simplified props for UI development
 interface TestHeaderProps {
@@ -52,30 +53,30 @@ export function TestHeader({
                             </span>
                         )}
 
-                        <button
+                        <Button
                             onClick={() => setIsTimerHidden(!isTimerHidden)}
-                            className="text-slate-500 hover:text-slate-800 flex items-center gap-1 text-sm font-medium p-1.5 rounded bg-slate-100 hover:bg-slate-200"
+                            type="default"
+                            icon={isTimerHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                         >
-                            {isTimerHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                             <span className="hidden sm:inline">{isTimerHidden ? "Show" : "Hide"}</span>
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
 
             <div className="flex-1 flex justify-end items-center gap-4">
                 {/* Mock calculator button mimicking Bluebook */}
-                <button
+                <Button
                     onClick={onToggleCalculator}
-                    className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium text-sm py-1.5 px-3 rounded border border-transparent hover:border-slate-200 hover:bg-slate-50"
+                    icon={<Calculator className="w-4 h-4" />}
+                    type="default"
                 >
-                    <Calculator className="w-5 h-5" />
                     <span className="hidden sm:inline">Calculator</span>
-                </button>
+                </Button>
 
-                <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2 rounded">
-                    <span>End Section</span>
-                </button>
+                <Button type="primary">
+                    End Section
+                </Button>
             </div>
         </header>
     );
@@ -112,12 +113,11 @@ export function TestFooter({
                     <div className="p-8 max-w-5xl mx-auto w-full">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-2xl font-bold text-slate-800 text-center flex-1">Select a Question</h3>
-                            <button
+                            <Button
                                 onClick={() => setIsGridOpen(false)}
-                                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2 rounded"
                             >
                                 Close
-                            </button>
+                            </Button>
                         </div>
 
                         <div className="flex gap-6 mb-8 justify-center text-sm font-medium text-slate-600">
@@ -171,33 +171,36 @@ export function TestFooter({
                 </div>
 
                 <div className="flex-1 flex justify-center items-center">
-                    <button
+                    <Button
                         onClick={() => setIsGridOpen(!isGridOpen)}
-                        className="flex items-center gap-3 px-6 py-2 bg-slate-100 hover:bg-slate-200 rounded-full font-bold text-slate-800"
+                        shape="round"
+                        size="large"
+                        className="font-bold text-slate-800"
                     >
                         <span>Question {currentIndex + 1} of {totalQuestions}</span>
-                        <ChevronRight className={`w-4 h-4 transition-transform ${isGridOpen ? '-rotate-90' : 'rotate-90'}`} />
-                    </button>
+                        <ChevronRight className={`w-4 h-4 transition-transform ${isGridOpen ? '-rotate-90' : 'rotate-90'} inline-block ml-2`} />
+                    </Button>
                 </div>
 
                 <div className="flex-1 flex justify-end items-center gap-3">
-                    <button
+                    <Button
                         onClick={onPrev}
                         disabled={currentIndex === 0}
-                        className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded font-medium"
+                        type="primary"
+                        icon={<ChevronLeft className="w-4 h-4" />}
+                        size="large"
                     >
-                        <ChevronLeft className="w-5 h-5" />
-                        <span>Back</span>
-                    </button>
+                        Back
+                    </Button>
 
-                    <button
+                    <Button
                         onClick={onNext}
                         disabled={currentIndex === totalQuestions - 1}
-                        className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded font-medium"
+                        type="primary"
+                        size="large"
                     >
-                        <span>Next</span>
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
+                        <span className="flex items-center gap-1">Next <ChevronRight className="w-4 h-4" /></span>
+                    </Button>
                 </div>
             </footer>
         </>

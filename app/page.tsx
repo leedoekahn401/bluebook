@@ -23,16 +23,14 @@ export default function Dashboard() {
   });
   const [userResults, setUserResults] = useState([]);
   const [sortOption, setSortOption] = useState("newest");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 6;
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const testsRes = await api.get(API_PATHS.TESTS);
-        const testsData = testsRes.data;
-        setTests(testsData.tests || []);
-
-        if (session) {
+    if (session) {
+      const fetchUserStats = async () => {
+        try {
           // Fetch user specific stats
           const statsRes = await api.get(API_PATHS.RESULTS);
           const statsData = statsRes.data;
@@ -45,16 +43,46 @@ export default function Dashboard() {
               streak: statsData.streak || 0,
             });
           }
+        } catch (e) {
+          console.error("Failed to load user stats", e);
+        }
+      };
+
+      fetchUserStats();
+    }
+  }, [session]);
+
+  useEffect(() => {
+    const fetchTests = async () => {
+      setLoading(true);
+      try {
+        let sortBy = "createdAt";
+        let sortOrder = "desc";
+
+        if (sortOption === "oldest") {
+          sortOrder = "asc";
+        } else if (sortOption === "title_asc") {
+          sortBy = "title";
+          sortOrder = "asc";
+        } else if (sortOption === "title_desc") {
+          sortBy = "title";
+          sortOrder = "desc";
+        }
+
+        const res = await api.get(`${API_PATHS.TESTS}?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`);
+        setTests(res.data.tests || []);
+        if (res.data.pagination) {
+          setTotalPages(res.data.pagination.totalPages);
         }
       } catch (e) {
-        console.error("Failed to load dashboard data", e);
+        console.error("Failed to fetch tests", e);
       } finally {
         setLoading(false);
       }
-    };
+    }
 
-    loadData();
-  }, [session]);
+    fetchTests();
+  }, [page, sortOption]);
 
   if (status === "loading") {
     return <Loading />;
@@ -163,7 +191,7 @@ export default function Dashboard() {
               <select
                 id="sort-tests"
                 value={sortOption}
-                onChange={(e) => setSortOption(e.target.value)}
+                onChange={(e) => { setSortOption(e.target.value); setPage(1); }}
                 className="bg-white border border-slate-300 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 outline-none"
               >
                 <option value="newest">Newest First</option>
@@ -180,26 +208,37 @@ export default function Dashboard() {
             <div className="text-center py-16 bg-white rounded-xl border border-slate-200 border-dashed">
               <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-slate-900">No tests available yet</h3>
-              <p className="text-slate-500 mt-1">Check back later or contact an administrator.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...tests].sort((a: any, b: any) => {
-                switch (sortOption) {
-                  case "title_asc":
-                    return a.title.localeCompare(b.title);
-                  case "title_desc":
-                    return b.title.localeCompare(a.title);
-                  case "oldest":
-                    return String(a._id).localeCompare(String(b._id));
-                  case "newest":
-                  default:
-                    return String(b._id).localeCompare(String(a._id));
-                }
-              }).map((test: any) => (
-                <TestCard key={test._id} test={test} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {tests.map((test: any) => (
+                  <TestCard key={test._id} test={test} />
+                ))}
+              </div>
+
+              {!loading && totalPages > 1 && (
+                <div className="flex justify-center items-center mt-8 gap-4">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-sm font-medium text-slate-600">
+                    Page {page} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className="px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
       </main>

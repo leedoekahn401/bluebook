@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, RefreshCcw, CheckCircle, XCircle, ChevronDown, ChevronUp, Sparkles, X } from "lucide-react";
 import Loading from "@/components/Loading";
 import ReviewChatbot from "@/components/ReviewChatbot";
+import ReviewCard from "@/components/ReviewCard";
 import api from "@/lib/axios";
 import { API_PATHS } from "@/lib/apiPaths";
 
@@ -71,23 +72,12 @@ export default function ReviewPage() {
 
     return (
         <div className="min-h-screen bg-slate-50">
-            {/* Sticky Top Header */}
-            <div className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-10">
+            {/* Main Two-Column Layout */}
+            <div className="bg-slate-50 pl-20 pt-10 sticky top-0 z-10">
                 <div className="max-w-7xl mx-auto flex items-center gap-4">
-                    <Link href="/" className="text-slate-500 hover:text-slate-900 p-2 bg-white rounded-full border border-slate-200">
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
                     <h1 className="text-2xl font-bold text-slate-900">Score Reports &amp; Review</h1>
-                    {activeChat && (
-                        <span className="ml-auto flex items-center gap-2 text-sm font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
-                            <Sparkles className="w-3.5 h-3.5" />
-                            AI Tutor Active
-                        </span>
-                    )}
                 </div>
             </div>
-
-            {/* Main Two-Column Layout */}
             <div className="max-w-7xl mx-auto flex gap-6 p-8">
 
                 {/* Left: Questions */}
@@ -108,7 +98,7 @@ export default function ReviewPage() {
                                     {/* Test Result Header */}
                                     <button
                                         onClick={() => toggleTestExpand(result._id)}
-                                        className="w-full text-left p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 hover:bg-slate-100 transition-colors"
+                                        className="w-full text-left p-6 border-b border-slate-100 flex justify-between items-center bg-white hover:bg-slate-50 transition-colors"
                                     >
                                         <div className="flex justify-between items-end w-full pr-6">
                                             <div>
@@ -141,85 +131,24 @@ export default function ReviewPage() {
                                         <div className="p-6 bg-white animate-in slide-in-from-top-2 duration-200">
                                             <h4 className="font-semibold text-slate-800 text-lg mb-4">Question Review</h4>
                                             <div className="space-y-3">
-                                                {result.answers.map((ans: any, idx: number) => {
-                                                    const isCorrect = ans.isCorrect;
-                                                    const q = ans.questionId;
-
-                                                    return (
-                                                        <div key={idx} className={`rounded-lg border overflow-hidden ${isCorrect ? "bg-emerald-50 border-emerald-100" : "bg-red-50 border-red-100"}`}>
-
-                                                            {/* Answer Header */}
-                                                            <div className="flex items-start justify-between p-4">
-                                                                <div className="flex items-start gap-3">
-                                                                    <div className={`w-8 h-8 rounded shrink-0 flex items-center justify-center font-bold text-white mt-0.5 ${isCorrect ? "bg-emerald-500" : "bg-red-500"}`}>
-                                                                        {idx + 1}
-                                                                    </div>
-                                                                    <div>
-                                                                        <p className="text-sm font-medium text-slate-900">
-                                                                            Your answer: <span className="font-bold">{ans.userAnswer || "Omitted"}</span>
-                                                                        </p>
-                                                                        {!isCorrect && q && (
-                                                                            <p className="text-sm font-medium text-emerald-700 mt-1">
-                                                                                Correct answer: <span className="font-bold">{q.correctAnswer}</span>
-                                                                            </p>
-                                                                        )}
-                                                                        {!isCorrect && q && (
-                                                                            <p className="text-xs text-slate-500 mt-2 line-clamp-2">{q.questionText}</p>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                                <div className="shrink-0 ml-3">
-                                                                    {isCorrect ? (
-                                                                        <CheckCircle className="w-5 h-5 text-emerald-600" />
-                                                                    ) : (
-                                                                        <XCircle className="w-5 h-5 text-red-600" />
-                                                                    )}
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Actions — wrong answers only */}
-                                                            {!isCorrect && q && (
-                                                                <>
-                                                                    {/* Explanation Toggle Row */}
-                                                                    <button
-                                                                        onClick={() => handleExpandExplanation(q._id)}
-                                                                        disabled={loadingExplanations[q._id]}
-                                                                        className="w-full flex items-center justify-between px-4 py-2.5 bg-red-50 border-t border-red-100 text-sm font-medium text-blue-700 hover:bg-red-100 transition-colors"
-                                                                    >
-                                                                        <span>{loadingExplanations[q._id] ? "Loading..." : expandedExplanations[q._id] ? "Hide Explanation" : "View Explanation"}</span>
-                                                                        {expandedExplanations[q._id] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                                                    </button>
-
-                                                                    {/* Explanation Body */}
-                                                                    {expandedExplanations[q._id] && (
-                                                                        <div className="px-4 py-3 bg-red-50 border-t border-red-100 text-sm text-slate-700 animate-in slide-in-from-top-1 duration-150">
-                                                                            <span className="font-bold text-slate-800">Explanation: </span>
-                                                                            {expandedExplanations[q._id]}
-                                                                        </div>
-                                                                    )}
-
-                                                                    {/* AI Tutor Button */}
-                                                                    <div className="px-4 py-2.5 border-t border-red-100 flex">
-                                                                        <button
-                                                                            onClick={() => setActiveChat(
-                                                                                activeChat?.questionId === q._id
-                                                                                    ? null
-                                                                                    : { questionId: q._id, questionText: q.questionText }
-                                                                            )}
-                                                                            className={`text-sm font-medium flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-colors ${activeChat?.questionId === q._id
-                                                                                ? "bg-indigo-100 text-indigo-700 border-indigo-200"
-                                                                                : "bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50"
-                                                                                }`}
-                                                                        >
-                                                                            <Sparkles className="w-3.5 h-3.5" />
-                                                                            {activeChat?.questionId === q._id ? "Tutoring this" : "Ask AI Tutor"}
-                                                                        </button>
-                                                                    </div>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
+                                                {result.answers.map((ans: any, idx: number) => (
+                                                    <ReviewCard
+                                                        key={idx}
+                                                        idx={idx}
+                                                        ans={ans}
+                                                        loadingExplanation={!!(ans.questionId && loadingExplanations[ans.questionId._id])}
+                                                        expandedExplanation={ans.questionId ? expandedExplanations[ans.questionId._id] : undefined}
+                                                        isActiveChat={!!(ans.questionId && ans.questionId._id === activeChat?.questionId)}
+                                                        onExpandExplanation={handleExpandExplanation}
+                                                        onToggleChat={(questionId, questionText) => {
+                                                            setActiveChat(
+                                                                activeChat?.questionId === questionId
+                                                                    ? null
+                                                                    : { questionId, questionText }
+                                                            );
+                                                        }}
+                                                    />
+                                                ))}
                                             </div>
                                         </div>
                                     )}
