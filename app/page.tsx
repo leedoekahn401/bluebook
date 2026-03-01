@@ -19,7 +19,6 @@ export default function Dashboard() {
   const [userStats, setUserStats] = useState({
     testsTaken: 0,
     highestScore: 0,
-    streak: 0,
   });
   const [userResults, setUserResults] = useState([]);
   const [sortOption, setSortOption] = useState("newest");
@@ -31,18 +30,24 @@ export default function Dashboard() {
     if (session) {
       const fetchUserStats = async () => {
         try {
-          // Fetch user specific stats
-          const statsRes = await api.get(API_PATHS.RESULTS);
+          // Fetch user specific stats for the last 30 days
+          const statsRes = await api.get(`${API_PATHS.RESULTS}?days=30`);
           const statsData = statsRes.data;
-          // Simplified stat calc from results
+
           if (statsData.results) {
             setUserResults(statsData.results);
+          }
+
+          // Fetch all-time user stats
+          const userRes = await api.get('/api/user/stats');
+          const userData = userRes.data;
+          if (userData) {
             setUserStats({
-              testsTaken: statsData.results.length,
-              highestScore: Math.max(0, ...statsData.results.map((r: any) => r.score)),
-              streak: statsData.streak || 0,
+              testsTaken: userData.testsTaken || 0,
+              highestScore: userData.highestScore || 0,
             });
           }
+
         } catch (e) {
           console.error("Failed to load user stats", e);
         }

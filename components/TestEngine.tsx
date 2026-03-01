@@ -18,7 +18,6 @@ export default function TestEngine({ testId }: { testId: string }) {
     const [questions, setQuestions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // User Interaction State
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<string, string>>({});
     const [flagged, setFlagged] = useState<Record<string, boolean>>({});
@@ -37,15 +36,11 @@ export default function TestEngine({ testId }: { testId: string }) {
                 const res = await api.get(API_PATHS.getQuestionsByTestId(testId));
                 const data = res.data;
 
-                // Let's assume there's an API giving us test info as well, or we pass it
-                // For now, setting mock test info based on length
-                const minutes = 60; // Hardcoded fallback
-
+                const minutes = 60;
                 setQuestions(data.questions || []);
                 setTimeRemaining(minutes * 60);
 
-                // Name stored from dashboard 
-                sessionStorage.setItem('testName', 'Practice Test Simulation');
+                sessionStorage.setItem('testName', 'Practice Test');
             } catch (err) {
                 console.error(err);
             } finally {
@@ -106,9 +101,21 @@ export default function TestEngine({ testId }: { testId: string }) {
                 };
             });
 
-            const correctCount = formattedAnswers.filter(a => a.isCorrect).length;
-            // Simple mock scoring logic
-            const score = 400 + Math.floor((correctCount / questions.length) * 1200);
+            let totalPoints = 0;
+            let earnedPoints = 0;
+
+            questions.forEach(q => {
+                const points = q.points || 0;
+                totalPoints += points;
+
+                const userAns = answers[q._id] || "";
+                if (userAns === q.correctAnswer) {
+                    earnedPoints += points;
+                }
+            });
+
+            // Scoring logic based on points weight
+            const score = totalPoints > 0 ? Math.floor((earnedPoints / totalPoints) * 1600) : 0;
 
             const res = await api.post(API_PATHS.RESULTS, {
                 testId,
@@ -167,7 +174,7 @@ export default function TestEngine({ testId }: { testId: string }) {
             </main>
 
 
-            <div className="fixed top-3 right-6 z-[60]">
+            <div className="fixed top-3 right-6 z[60px]">
                 <Popconfirm
                     title="Submit Test"
                     description="Are you sure you want to end this section and submit your test?"

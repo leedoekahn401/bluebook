@@ -7,7 +7,6 @@ export const UserValidationSchema = z.object({
     role: z.enum(["user", "admin"]).default("user"),
     testsTaken: z.array(z.string()).optional(),
     highestScore: z.number().min(0).default(0),
-    streak: z.number().min(0).default(0),
     lastTestDate: z.date().optional(),
     wrongQuestions: z.array(z.string()).optional(),
 });

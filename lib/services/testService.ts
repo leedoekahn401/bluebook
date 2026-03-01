@@ -1,6 +1,6 @@
 import dbConnect from "@/lib/mongodb";
 import Test from "@/lib/models/Test";
-import { TestValidationSchema } from "@/lib/validations/test";
+import { TestValidationSchema } from "@/lib/schema/test";
 import { z } from "zod";
 
 export const testService = {

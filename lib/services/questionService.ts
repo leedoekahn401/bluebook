@@ -1,7 +1,7 @@
 import dbConnect from "@/lib/mongodb";
 import Question from "@/lib/models/Question";
 import Test from "@/lib/models/Test";
-import { QuestionValidationSchema } from "@/lib/validations/question";
+import { QuestionValidationSchema } from "@/lib/schema/question";
 import { z } from "zod";
 
 export const questionService = {
@@ -21,7 +21,6 @@ export const questionService = {
             const validatedData = QuestionValidationSchema.parse(data);
             await dbConnect();
 
-            // Verify test exists
             const test = await Test.findById(validatedData.testId);
             if (!test) {
                 throw new Error("Test not found");

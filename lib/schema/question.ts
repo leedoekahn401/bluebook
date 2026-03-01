@@ -9,7 +9,7 @@ export const QuestionValidationSchema = z.object({
     correctAnswer: z.string().min(1, "Correct answer is required"),
     explanation: z.string().min(1, "Explanation is required"),
     difficulty: z.enum(["easy", "medium", "hard"]).default("medium"),
-    points: z.number().min(1).default(10),
+    points: z.number().min(0).default(10),
 });
 
 export type QuestionInput = z.infer<typeof QuestionValidationSchema>;

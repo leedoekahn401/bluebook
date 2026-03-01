@@ -16,6 +16,7 @@ export const resultController = {
 
             return NextResponse.json({ result: newResult }, { status: 201 });
         } catch (error: any) {
+            console.error("Error creating result:", error);
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
     },
@@ -27,7 +28,11 @@ export const resultController = {
                 return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
             }
 
-            const data = await resultService.getUserResults(session.user.id);
+            const url = new URL(req.url);
+            const daysQuery = url.searchParams.get("days");
+            const days = daysQuery ? parseInt(daysQuery) : undefined;
+
+            const data = await resultService.getUserResults(session.user.id, days);
             return NextResponse.json(data);
         } catch (error: any) {
             return NextResponse.json({ error: error.message }, { status: 500 });

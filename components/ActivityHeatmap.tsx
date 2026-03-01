@@ -7,7 +7,7 @@ interface ActivityHeatmapProps {
 }
 
 export default function ActivityHeatmap({ results }: ActivityHeatmapProps) {
-    const { heatmapData, maxActivity } = useMemo(() => {
+    const { heatmapData } = useMemo(() => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -27,15 +27,13 @@ export default function ActivityHeatmap({ results }: ActivityHeatmapProps) {
             activityMap.set(dateKey, (activityMap.get(dateKey) || 0) + 1);
         });
 
-        let maxAct = 0;
         const data = last30Days.map((date) => {
             const dateKey = date.toISOString().split("T")[0];
             const count = activityMap.get(dateKey) || 0;
-            if (count > maxAct) maxAct = count;
             return { date, count, dateKey };
         });
 
-        return { heatmapData: data, maxActivity: maxAct };
+        return { heatmapData: data };
     }, [results]);
 
     const getColorClass = (count: number) => {

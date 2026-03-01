@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const AnswerValidationSchema = z.object({
     questionId: z.string().min(1, "Question ID is required"),
-    userAnswer: z.string().min(1, "User answer is required"),
+    userAnswer: z.string(),
     isCorrect: z.boolean(),
 });
 

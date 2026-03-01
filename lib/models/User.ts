@@ -7,7 +7,6 @@ export interface IUser extends Document {
     role: "user" | "admin";
     testsTaken: mongoose.Types.ObjectId[];
     highestScore: number;
-    streak: number;
     lastTestDate?: Date;
     wrongQuestions: mongoose.Types.ObjectId[]; // Ref to Result or Question
 }
@@ -20,7 +19,6 @@ const UserSchema: Schema<IUser> = new Schema(
         role: { type: String, enum: ["user", "admin"], default: "user" },
         testsTaken: [{ type: Schema.Types.ObjectId, ref: "Test" }],
         highestScore: { type: Number, default: 0 },
-        streak: { type: Number, default: 0 },
         lastTestDate: { type: Date },
         wrongQuestions: [{ type: Schema.Types.ObjectId, ref: "Question" }],
     },

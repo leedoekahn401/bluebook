@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                                         <input
                                             type="number"
                                             required
-                                            value={testForm.timeLimit}
+                                            value={Number.isNaN(testForm.timeLimit) ? "" : testForm.timeLimit}
                                             onChange={(e) => setTestForm({ ...testForm, timeLimit: parseInt(e.target.value) })}
                                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white text-slate-900"
                                         />
@@ -262,7 +262,7 @@ export default function AdminDashboard() {
                                         <input
                                             type="number"
                                             required
-                                            value={questionForm.points}
+                                            value={Number.isNaN(questionForm.points) ? "" : questionForm.points}
                                             onChange={(e) => setQuestionForm({ ...questionForm, points: parseInt(e.target.value) })}
                                             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white text-slate-900"
                                         />

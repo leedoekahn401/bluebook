@@ -37,7 +37,7 @@ export default function AuthPage() {
             } else {
                 const res = await api.post(API_PATHS.AUTH_REGISTER, { email, password, name });
 
-                if (res.status === 200 || res.status === 201) {
+                if (res.status === 200) {
                     // Auto login after register
                     await signIn("credentials", { email, password, redirect: false });
                     router.push("/");
